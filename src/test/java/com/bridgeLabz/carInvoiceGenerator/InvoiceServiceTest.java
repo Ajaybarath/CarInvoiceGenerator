@@ -11,7 +11,7 @@ public class InvoiceServiceTest {
         InvoiceGenerator invoiceGenerator = new InvoiceGenerator();
         double distance = 2.0;
         int time = 5;
-        double fare = invoiceGenerator.calculateFare(distance, time);
+        double fare = invoiceGenerator.calculateFare(distance, time, Ride.RideType.NORMAL);
         Assertions.assertEquals(25, fare);
     }
 
@@ -20,7 +20,7 @@ public class InvoiceServiceTest {
         InvoiceGenerator invoiceGenerator = new InvoiceGenerator();
         double distance = 0.1;
         int time = 1;
-        double fare = invoiceGenerator.calculateFare(distance, time);
+        double fare = invoiceGenerator.calculateFare(distance, time, Ride.RideType.NORMAL);
         Assertions.assertEquals(5, fare);
     }
 
@@ -40,10 +40,6 @@ public class InvoiceServiceTest {
 
     @Test
     public void givenUserIdGetInvoiceSummaryForAllRides() {
-        Ride[] rides = {
-                new Ride(2.0, 5),
-                new Ride(0.1, 1)
-        };
 
         int userId = 123;
 
@@ -54,6 +50,22 @@ public class InvoiceServiceTest {
         InvoiceSummary invoiceSummary = new InvoiceGenerator().calculateFare(rideRepository);
 
         InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 30);
+
+        Assertions.assertEquals(expectedInvoiceSummary, invoiceSummary);
+    }
+
+    @Test
+    public void givenUserIdGetInvoiceSummaryForAllRidesOfPremiumAndNormalCategory() {
+
+        int userId = 123;
+
+        RideRepository rideRepository = new RideRepository(userId);
+        rideRepository.addRide(new Ride(2.0, 5, Ride.RideType.NORMAL));
+        rideRepository.addRide(new Ride(0.1, 1, Ride.RideType.PREMIUM));
+
+        InvoiceSummary invoiceSummary = new InvoiceGenerator().calculateFare(rideRepository);
+
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 45);
 
         Assertions.assertEquals(expectedInvoiceSummary, invoiceSummary);
     }
